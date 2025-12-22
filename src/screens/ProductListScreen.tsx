@@ -32,6 +32,11 @@ export const ProductListScreen: React.FC = () => {
       cellAlign: 'left',
       enableSorting: true,
       filterable: true,
+      cell: info => (
+        <a href={`/products/${info.row.original.id}`}>
+          {String(info.getValue())}
+        </a>
+      ),
     },
     {
       header: 'Price',

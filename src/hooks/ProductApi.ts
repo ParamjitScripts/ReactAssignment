@@ -29,3 +29,19 @@ export const getProducts = (
         queryFn: () => fetchProducts(params),
     })
 }
+
+export const fetchProductById = async (id: Number): Promise<IProduct> => {
+    const url = `${API_BASE_URL}products/${id}`
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            'Content-Type': 'application/json',
+        },
+    })
+    if (!response.ok) {
+        throw new Error('Failed to fetch product')
+    }
+    const data = (await response.json()) as { data: IProduct }
+    return data.data
+}

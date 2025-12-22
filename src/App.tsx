@@ -1,9 +1,9 @@
 import {WuPrimaryNavbar} from '@npm-questionpro/wick-ui-lib'
 import './App.css'
-import {API_BASE_URL} from './constants/appConstants'
-import type {IServerResponse} from './types/IServerResponse'
-import type {IProduct} from './types/IProduct'
-import {useQuery, type UseQueryResult} from '@tanstack/react-query'
+// import {API_BASE_URL} from './constants/appConstants'
+// import type {IServerResponse} from './types/IServerResponse'
+// import type {IProduct} from './types/IProduct'
+// import {useQuery, type UseQueryResult} from '@tanstack/react-query'
 import {AppRoutes} from './AppRoutes'
 
 // const fetchProduct = async (): Promise<IServerResponse<IProduct[]>> => {
@@ -54,15 +54,6 @@ export const App: React.FC = () => {
           Links={[
             <a key="home" href="/" className="active">
               Home
-            </a>,
-            <a key="about" href="#">
-              About
-            </a>,
-            <a key="services" href="#">
-              Services
-            </a>,
-            <a key="contact" href="#">
-              Contact
             </a>,
             <a key="product" href="/products">
               Product

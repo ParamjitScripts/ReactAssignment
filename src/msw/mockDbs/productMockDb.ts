@@ -9,15 +9,15 @@ const products: IProduct[] = [{
 },
 {
     id: 2,
-    name: ' Black Magic Tire Wet Gel',
-    description: ' Black Magic Tire Wet Gel, 16 oz. Provides a deep, black shine that lasts for weeks. Non-greasy formula resists water and heat.',
+    name: 'Black Magic Tire Wet Gel',
+    description: 'Black Magic Tire Wet Gel, 16 oz. Provides a deep, black shine that lasts for weeks. Non-greasy formula resists water and heat.',
     price: 13.99,
     currency: 'USD',
 }]
 
 export const productMockDb = {
-    getProduct: (): IProduct => {
-        return products[0]
+    getProduct: (id: number): IProduct => {
+        return products.find(product => product.id === id) || products[0]
     },
     getProducts: (): IProduct[] => {
         return products

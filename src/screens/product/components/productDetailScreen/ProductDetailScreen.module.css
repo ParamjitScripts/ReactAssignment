@@ -1,0 +1,16 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.leftAlign {
+  text-align: left;
+}
+.border {
+  border-bottom: 1px solid #e2e8f0;
+}
+.h1 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}

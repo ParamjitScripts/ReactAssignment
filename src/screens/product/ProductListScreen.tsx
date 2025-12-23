@@ -1,16 +1,31 @@
 import {
+  WuButton,
   WuDisplay,
   WuInput,
   WuTable,
   type IWuTableColumnDef,
 } from '@npm-questionpro/wick-ui-lib'
-import type {IProduct} from '../types/IProduct'
-import {getProducts} from '../hooks/ProductApi'
+import type {IProduct} from '../../types/IProduct'
+import {getProducts} from '../../hooks/ProductApi'
 import {useState} from 'react'
+import {ProductModal} from './components/productForm/ProductForm'
+import {Link} from 'react-router'
 
 export const ProductListScreen: React.FC = () => {
   const {data, error, isLoading} = getProducts()
   const [filterText, setFilterText] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
+
+  const openModal = (product: IProduct) => {
+    setSelectedProduct(product)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedProduct(null)
+  }
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -56,10 +71,14 @@ export const ProductListScreen: React.FC = () => {
       cell: info => {
         const product = info.row.original
         return (
-          <div>
-            <button onClick={() => alert(`Viewing product: ${product.name}`)}>
+          <div className="wu-flex wu-align-center wu-gap-2">
+            {/* <button onClick={() => alert(`Viewing product: ${product.name}`)}>
               View
-            </button>
+            </button> */}
+            <WuButton variant="outline">
+              <Link to={`/products/${info.row.original.id}`}>View</Link>
+            </WuButton>
+            <WuButton onClick={() => openModal(product)}>Edit</WuButton>
           </div>
         )
       },
@@ -68,7 +87,16 @@ export const ProductListScreen: React.FC = () => {
 
   return (
     <>
-      <WuDisplay size="lg">Product List Screen</WuDisplay>
+      <div className="wu-flex wu-items-center wu-justify-between wu-my-4 wu-py-2">
+        <WuDisplay size="md">Product List Screen</WuDisplay>
+        <WuButton
+          onClick={() => openModal(null)}
+          variant="primary"
+          className="wu-mb-4 wu-mt-2"
+        >
+          Create Product
+        </WuButton>
+      </div>
       <WuInput
         value={filterText}
         onChange={e => setFilterText(e.target.value)}
@@ -82,6 +110,13 @@ export const ProductListScreen: React.FC = () => {
         filterText={filterText}
         columns={columns}
         data={products}
+        variant="striped"
+      />
+
+      <ProductModal
+        product={selectedProduct || null}
+        isOpen={isModalOpen}
+        onClose={closeModal}
       />
     </>
   )

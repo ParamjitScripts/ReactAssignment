@@ -1,17 +1,11 @@
-import {
-  WuButton,
-  WuCard,
-  WuDataTable,
-  WuHeading,
-  WuTable,
-} from '@npm-questionpro/wick-ui-lib'
+import {WuButton, WuCard, WuHeading} from '@npm-questionpro/wick-ui-lib'
 import {Link, useParams} from 'react-router'
-import type {IProduct} from '../../../../types/IProduct'
+import type {IProduct} from '../type/IProduct'
 import {useQuery} from '@tanstack/react-query'
-import {fetchProductById} from '../../../../hooks/ProductApi'
+import {fetchProductById} from '../../../hooks/ProductApi'
 import styles from './ProductDetailScreen.module.css'
 
-const useProductIdFromParams = (): Number => {
+const useProductIdFromParams = (): number => {
   const {productId} = useParams<{productId: string}>() // Placeholder for useParams
   console.log('productId from params:', productId)
   if (!productId || productId.trim() === '' || isNaN(Number(productId))) {
@@ -44,7 +38,7 @@ export default function ProductDetailScreen() {
   const cardExample = () => {
     return (
       <WuCard rounded onClick={function uV() {}}>
-        {/* <WuHeading size="md">{product.name}</WuHeading> */}
+        <WuHeading size="md">{product.name}</WuHeading>
         <table className={styles.table}>
           <tbody>
             <tr className={styles.border}>
@@ -75,9 +69,9 @@ export default function ProductDetailScreen() {
         </table>
         <div className="wu-flex wu-items-end wu-justify-end wu-gap-4 wu-pb-4">
           {/* <WuButton>Action</WuButton> */}
-          <WuButton variant="outline">
-            <Link to="/products">Back to Products</Link>
-          </WuButton>
+          <Link to="/products">
+            <WuButton variant="outline">Back to Products</WuButton>
+          </Link>
         </div>
       </WuCard>
     )
@@ -85,7 +79,7 @@ export default function ProductDetailScreen() {
 
   return (
     <>
-      <h1 className={styles.h1}>Product Detail : {product.name}</h1>
+      <h1 className={styles.h1}>Product Detail</h1>
       {product && <div className="wu-h-40">{cardExample()}</div>}
     </>
   )

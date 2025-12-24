@@ -8,8 +8,7 @@ import {
   WuModalClose,
 } from '@npm-questionpro/wick-ui-lib'
 import React, {useEffect, useState} from 'react'
-import type {IProduct} from '../../../../types/IProduct'
-import {Form} from 'react-router'
+import type {IProduct} from '../../type/IProduct'
 
 interface ProductModalProps {
   product: IProduct | null

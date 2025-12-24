@@ -1,7 +1,6 @@
 import {screen} from '@testing-library/dom'
-import {App} from '../../../App'
-import {testUtil} from '../../../tests/testUtil'
-import {use} from 'react'
+import {App} from '../../../../App'
+import {testUtil} from '../../../../tests/testUtil'
 import userEvent from '@testing-library/user-event'
 
 const productRoute = {route: '/products'}
@@ -16,7 +15,6 @@ describe('ProductListScreen', () => {
 
     await screen.findAllByText('Armor All Extreme Tire Shine Gel')
     await screen.findByText('Black Magic Tire Wet Gel')
-    // await screen.findByText(/16 oz/i)
     screen.getByRole('cell', {name: /16 oz/i})
     const createProductButton = screen.getByRole('button', {
       name: /Create Product/i,
@@ -29,7 +27,7 @@ describe('ProductListScreen', () => {
     await userEvent.type(titleBox, 'Test Product')
     const descriptionBox = screen.getByRole('textbox', {name: /Description/i})
     await userEvent.type(descriptionBox, 'This is a test product')
-    const priceBox = screen.getByRole('textbox', {name: /Price/i})
+    const priceBox = screen.getByRole('spinbutton', {name: /Price/i})
     await userEvent.clear(priceBox)
     await userEvent.type(priceBox, '99.99')
 

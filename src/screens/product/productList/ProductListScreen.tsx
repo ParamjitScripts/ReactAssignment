@@ -5,11 +5,12 @@ import {
   WuTable,
   type IWuTableColumnDef,
 } from '@npm-questionpro/wick-ui-lib'
-import type {IProduct} from '../../types/IProduct'
-import {getProducts} from '../../hooks/ProductApi'
-import {useState} from 'react'
-import {ProductModal} from './components/productForm/ProductForm'
-import {Link} from 'react-router'
+import type {IProduct} from '../type/IProduct'
+import {getProducts} from '../../../hooks/ProductApi'
+import {useCallback, useMemo, useState} from 'react'
+import {ProductModal} from '../feature/productForm/ProductForm'
+import {getProductColumns} from './ProductTableColumns'
+import {productMockDb} from '../../../msw/mockDbs/productMockDb'
 
 export const ProductListScreen: React.FC = () => {
   const {data, error, isLoading} = getProducts()
@@ -17,15 +18,21 @@ export const ProductListScreen: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
 
-  const openModal = (product: IProduct) => {
+  const openModal = useCallback((product: IProduct | null) => {
     setSelectedProduct(product)
     setIsModalOpen(true)
-  }
+  }, [])
 
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedProduct(null)
+    productMockDb.reset()
   }
+
+  const columns: IWuTableColumnDef<IProduct>[] = useMemo(
+    () => getProductColumns(openModal),
+    [openModal],
+  )
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -36,54 +43,13 @@ export const ProductListScreen: React.FC = () => {
     return <div>Error: {error?.message || 'Something went wrong'}</div>
   }
   const products = data?.data
-  if (!products || products.length === 0) {
-    throw new Error('Products not found')
-  }
+  console.log('Fetched products:', products)
+  // Display message if no products found instead of throwing an error
+  // if (!products || products !== undefined || products.length === 0) {
+  //   //throw new Error('Products not found')
+  // }
 
-  const columns: IWuTableColumnDef<IProduct>[] = [
-    {
-      header: 'Name',
-      accessorKey: 'name',
-      cellAlign: 'left',
-      enableSorting: true,
-      filterable: true,
-      cell: info => (
-        <a href={`/products/${info.row.original.id}`}>
-          {String(info.getValue())}
-        </a>
-      ),
-    },
-    {
-      header: 'Price',
-      accessorKey: 'price',
-      cellAlign: 'left',
-      enableSorting: true,
-    },
-    {
-      header: 'Description',
-      accessorKey: 'description',
-      cellAlign: 'left',
-    },
-    {
-      header: 'Actions',
-      accessorKey: 'actions',
-      cellAlign: 'left',
-      cell: info => {
-        const product = info.row.original
-        return (
-          <div className="wu-flex wu-align-center wu-gap-2">
-            {/* <button onClick={() => alert(`Viewing product: ${product.name}`)}>
-              View
-            </button> */}
-            <WuButton variant="outline">
-              <Link to={`/products/${info.row.original.id}`}>View</Link>
-            </WuButton>
-            <WuButton onClick={() => openModal(product)}>Edit</WuButton>
-          </div>
-        )
-      },
-    },
-  ]
+  //const columns = getProductColumns(openModal)
 
   return (
     <>
@@ -103,13 +69,16 @@ export const ProductListScreen: React.FC = () => {
         placeholder="Search..."
       />
       <WuTable
+        NoDataContent={
+          <h2 className="wu-text-center wu-text-red-400">No Product Found!</h2>
+        }
         sort={{
           enabled: true,
           initial: [{id: 'name', desc: false}],
         }}
         filterText={filterText}
         columns={columns}
-        data={products}
+        data={products || []}
         variant="striped"
       />
 

@@ -1,7 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { API_BASE_URL } from '../constants/appConstants'
 import type { IServerResponse } from '../types/IServerResponse'
-import type { IProduct, ProductQueryParams } from '../types/IProduct'
+import type { IProduct, ProductQueryParams } from '../screens/product/type/IProduct'
 
 const fetchProducts = async (params: ProductQueryParams): Promise<IServerResponse<IProduct[]>> => {
     const searchParams = new URLSearchParams()

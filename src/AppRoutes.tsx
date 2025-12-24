@@ -1,7 +1,7 @@
 import {Navigate, Route, Routes} from 'react-router'
-import {ProductListScreen} from './screens/product/ProductListScreen'
+import {ProductListScreen} from './screens/product/productList/ProductListScreen'
 import {Home} from './screens/Home'
-import ProductDetailScreen from './screens/product/components/productDetailScreen/ProductDetailScreen'
+import ProductDetailScreen from './screens/product/productDetailScreen/ProductDetailScreen'
 
 export const AppRoutes: React.FC<React.PropsWithChildren> = () => {
   return (

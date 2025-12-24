@@ -5,6 +5,7 @@ import * as ResizeObserverModule from 'resize-observer-polyfill'
 import '@testing-library/dom'
 import { mswTestServer } from '../msw/mswTestServer'
 import '@testing-library/jest-dom'
+import { productMockDb } from '../msw/mockDbs/productMockDb'
 
 beforeAll(() => {
     // https://stackoverflow.com/a/72543616/8596140
@@ -14,7 +15,9 @@ beforeAll(() => {
     mswTestServer.listen()
 })
 
-beforeEach(() => { })
+beforeEach(() => {
+    productMockDb.reset()
+})
 
 afterEach(() => {
     // Reset all request handlers

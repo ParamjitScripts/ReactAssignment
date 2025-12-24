@@ -1,7 +1,7 @@
 import { HttpResponse, http } from 'msw'
 import { productMockDb } from '../mockDbs/productMockDb'
 import { API_BASE_URL } from '../../constants/appConstants'
-import type { IProduct } from '../../types/IProduct'
+import type { IProduct } from '../../screens/product/type/IProduct'
 
 const sendResponse = <T>(res: T): HttpResponse<{ data: T }> => {
   return HttpResponse.json({ data: res })

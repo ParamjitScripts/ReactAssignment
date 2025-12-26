@@ -7,14 +7,13 @@ import {
   WuModalFooter,
   WuModalClose,
 } from '@npm-questionpro/wick-ui-lib'
-import React, {useEffect, useState} from 'react'
-import type {IProduct} from '../../type/IProduct'
-
-interface ProductModalProps {
-  product: IProduct | null
-  isOpen: boolean
-  onClose: () => void
-}
+import {useForm, Controller} from 'react-hook-form'
+import React, {useEffect} from 'react'
+import type {
+  InfoRowProps,
+  IProduct,
+  ProductModalProps,
+} from '../../type/IProduct'
 
 const emptyProduct: IProduct = {
   name: '',
@@ -28,78 +27,29 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [priceError, setPriceError] = useState<string | null>(null)
-
-  const [productFormData, setProductFormData] = useState<IProduct>({
-    name: '',
-    description: '',
-    price: 0,
-    currency: '',
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: {errors, isValid},
+  } = useForm<IProduct>({
+    defaultValues: emptyProduct,
+    mode: 'onChange',
   })
 
   useEffect(() => {
     if (!isOpen) return
 
     if (product) {
-      setProductFormData(product)
+      reset(product)
     } else {
-      setProductFormData(emptyProduct)
+      reset(emptyProduct)
     }
-  }, [isOpen, product?.id])
+  }, [isOpen, product?.id, reset])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log('Submitting product:', productFormData)
-    const {price} = productFormData
-
-    if (price < 1 || price > 1000) {
-      alert('Price must be between 1 and 1000')
-      return
-    }
+  const onSubmit = (data: IProduct) => {
+    console.log('Submitting product:', data)
     onClose()
-    event.preventDefault()
-  }
-
-  const handleChange =
-    <K extends keyof IProduct>(key: K) =>
-    (value: IProduct[K]) => {
-      setProductFormData(prev => ({
-        ...prev,
-        [key]: value,
-      }))
-    }
-
-  const handlePriceChange = (value: string) => {
-    // Allow empty while typing
-    if (value === '') {
-      setPriceError(null)
-      handleChange('price')(value as any)
-      return
-    }
-
-    const num = Number(value)
-
-    // Not a number
-    if (Number.isNaN(num)) {
-      setPriceError('Price must be a number')
-      return
-    }
-
-    // Decimal validation (max 2 decimals)
-    const decimalRegex = /^\d+(\.\d{1,2})?$/
-    if (!decimalRegex.test(value)) {
-      setPriceError('Price can have up to 2 decimal places')
-      return
-    }
-
-    // Range validation
-    if (num < 1 || num > 1000) {
-      setPriceError('Price must be between 1 and 1000')
-      return
-    }
-
-    // Valid price
-    setPriceError(null)
-    handleChange('price')(num)
   }
 
   //   if (!product) return null
@@ -111,25 +61,60 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       <WuModalContent className="wu-max-w-full">
         <div className="wu-p-4">
           <div className="wu-flex wu-flex-col wu-gap-3">
-            <form onSubmit={handleSubmit} id="product-form">
-              <InfoRow
-                label="Name"
-                value={productFormData.name}
-                onChange={handleChange('name')}
+            <form onSubmit={handleSubmit(onSubmit)} id="product-form">
+              <Controller
+                name="name"
+                control={control}
+                rules={{required: 'Name is required'}}
+                render={({field}) => (
+                  <InfoRow
+                    label="Name"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.name?.message}
+                  />
+                )}
               />
 
-              <InfoRow
-                label="Description"
-                value={productFormData.description}
-                onChange={handleChange('description')}
+              <Controller
+                name="description"
+                control={control}
+                rules={{required: 'Description is required'}}
+                render={({field}) => (
+                  <InfoRow
+                    label="Description"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.description?.message}
+                  />
+                )}
               />
 
-              <InfoRow
-                label="Price"
-                value={productFormData.price}
-                // onChange={value => handleChange('price')(Number(value))}
-                onChange={handlePriceChange}
-                error={priceError}
+              <Controller
+                name="price"
+                control={control}
+                rules={{
+                  required: 'Price is required',
+                  min: {value: 1, message: 'Price must be at least 1'},
+                  max: {value: 1000, message: 'Price must not exceed 1000'},
+                  validate: {
+                    decimal: (value: number) => {
+                      const decimalRegex = /^\d+(\.\d{1,2})?$/
+                      return (
+                        decimalRegex.test(String(value)) ||
+                        'Price can have up to 2 decimal places'
+                      )
+                    },
+                  },
+                }}
+                render={({field}) => (
+                  <InfoRow
+                    label="Price"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.price?.message}
+                  />
+                )}
               />
             </form>
           </div>
@@ -140,7 +125,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           type="submit"
           variant="primary"
           form="product-form"
-          disabled={productFormData.price < 1 || productFormData.price > 1000}
+          disabled={!isValid}
         >
           Save
         </WuButton>
@@ -148,12 +133,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       </WuModalFooter>
     </WuModal>
   )
-}
-interface InfoRowProps {
-  label: string
-  value: any
-  onChange: (value: any) => void
-  error?: string | null
 }
 
 const InfoRow: React.FC<InfoRowProps> = ({label, value, onChange, error}) => (

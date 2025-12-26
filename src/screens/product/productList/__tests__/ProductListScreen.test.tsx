@@ -16,6 +16,10 @@ describe('ProductListScreen', () => {
     await screen.findAllByText('Armor All Extreme Tire Shine Gel')
     await screen.findByText('Black Magic Tire Wet Gel')
     screen.getByRole('cell', {name: /16 oz/i})
+  })
+
+  test('Open dialog for create product', async () => {
+    await testUtil.renderWithRoute(<App />, productRoute)
     const createProductButton = screen.getByRole('button', {
       name: /Create Product/i,
     })

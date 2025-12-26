@@ -26,7 +26,7 @@ export const ProductListScreen: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedProduct(null)
-    productMockDb.reset()
+    //productMockDb.reset()
   }
 
   const columns: IWuTableColumnDef<IProduct>[] = useMemo(

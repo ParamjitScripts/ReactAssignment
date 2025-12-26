@@ -1,24 +1,10 @@
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { API_BASE_URL } from '../constants/appConstants'
+import { useQuery, useMutation, useQueryClient, type UseQueryResult, type UseMutationResult } from '@tanstack/react-query'
 import type { IServerResponse } from '../types/IServerResponse'
 import type { IProduct, ProductQueryParams } from '../screens/product/type/IProduct'
+import apiService from '../services/apiService'
 
 const fetchProducts = async (params: ProductQueryParams): Promise<IServerResponse<IProduct[]>> => {
-    const searchParams = new URLSearchParams()
-    if (params.search) searchParams.set('search', params.search)
-    if (params.name) searchParams.set('name', params.name)
-    const url = `${API_BASE_URL}products${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            'Content-Type': 'application/json',
-        },
-    })
-    if (!response.ok) {
-        throw new Error('Failed to fetch product')
-    }
-    return response.json() as Promise<IServerResponse<IProduct[]>>
+    return apiService.get<IServerResponse<IProduct[]>>('products', params)
 }
 
 export const getProducts = (
@@ -31,17 +17,36 @@ export const getProducts = (
 }
 
 export const fetchProductById = async (id: Number): Promise<IProduct> => {
-    const url = `${API_BASE_URL}products/${id}`
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            'Content-Type': 'application/json',
+    const data = await apiService.get<{ data: IProduct }>(`products/${id}`)
+    return data.data
+}
+
+const createProduct = async (product: IProduct): Promise<IServerResponse<IProduct>> => {
+    return apiService.post<IServerResponse<IProduct>>('products', product)
+}
+
+const updateProduct = async (product: IProduct): Promise<IServerResponse<IProduct>> => {
+    return apiService.put<IServerResponse<IProduct>>(`products/${product.id}`, product)
+}
+
+export const useCreateProduct = (): UseMutationResult<IServerResponse<IProduct>, Error, IProduct> => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: createProduct,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] })
         },
     })
-    if (!response.ok) {
-        throw new Error('Failed to fetch product')
-    }
-    const data = (await response.json()) as { data: IProduct }
-    return data.data
+}
+
+export const useUpdateProduct = (): UseMutationResult<IServerResponse<IProduct>, Error, IProduct> => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: updateProduct,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] })
+        },
+    })
 }

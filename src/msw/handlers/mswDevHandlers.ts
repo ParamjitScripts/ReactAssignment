@@ -35,6 +35,30 @@ export const mswDevHandlers = [
     const products = productMockDb.getProducts()
     return sendResponse<IProduct[]>(products)
   }),
+  http.post(`${API_BASE_URL}products`, async ({ request }) => {
+    await delayedResponse();
+    const newProduct = await request.json() as IProduct
+    const productWithId = {
+      ...newProduct,
+      id: Date.now(),
+    }
+    productMockDb.addProduct(productWithId)
+    return sendResponse<IProduct>(productWithId)
+  }),
+  http.put(`${API_BASE_URL}products/:id`, async ({ params, request }) => {
+    await delayedResponse();
+    const id = Number(params.id)
+    const updatedProduct = await request.json() as IProduct
+    const product = productMockDb.getProduct(id)
+    if (!product) {
+      return HttpResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+    productMockDb.updateProduct({ ...updatedProduct, id })
+    return sendResponse<IProduct>({ ...updatedProduct, id })
+  }),
 ]
 function delayedResponse(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 500))

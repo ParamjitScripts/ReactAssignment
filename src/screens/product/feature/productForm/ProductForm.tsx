@@ -14,6 +14,7 @@ import type {
   IProduct,
   ProductModalProps,
 } from '../../type/IProduct'
+import {useCreateProduct, useUpdateProduct} from '../../../../hooks/ProductApi'
 
 const emptyProduct: IProduct = {
   name: '',
@@ -37,6 +38,9 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     mode: 'onChange',
   })
 
+  const createProductMutation = useCreateProduct()
+  const updateProductMutation = useUpdateProduct()
+
   useEffect(() => {
     if (!isOpen) return
 
@@ -48,8 +52,22 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   }, [isOpen, product?.id, reset])
 
   const onSubmit = (data: IProduct) => {
-    console.log('Submitting product:', data)
-    onClose()
+    if (product?.id) {
+      updateProductMutation.mutate(
+        {...data, id: product.id},
+        {
+          onSuccess: () => {
+            onClose()
+          },
+        },
+      )
+    } else {
+      createProductMutation.mutate(data, {
+        onSuccess: () => {
+          onClose()
+        },
+      })
+    }
   }
 
   //   if (!product) return null
@@ -125,9 +143,15 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           type="submit"
           variant="primary"
           form="product-form"
-          disabled={!isValid}
+          disabled={
+            !isValid ||
+            createProductMutation.isPending ||
+            updateProductMutation.isPending
+          }
         >
-          Save
+          {createProductMutation.isPending || updateProductMutation.isPending
+            ? 'Saving...'
+            : 'Save'}
         </WuButton>
         <WuModalClose onClick={onClose}>Cancel</WuModalClose>
       </WuModalFooter>
@@ -140,7 +164,10 @@ const InfoRow: React.FC<InfoRowProps> = ({label, value, onChange, error}) => (
     <WuInput
       Label={label}
       value={value}
-      onChange={e => onChange(e.target.value)}
+      onChange={e => {
+        const newValue = label === 'Price' ? Number(e.target.value) : e.target.value
+        onChange(newValue)
+      }}
       type={label === 'Price' ? 'number' : 'text'}
       step={label === 'Price' ? '0.01' : undefined}
       placeholder="Enter text"

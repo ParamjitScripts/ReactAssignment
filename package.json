@@ -21,6 +21,7 @@
     "@npm-questionpro/wick-ui-icon": "^8.0.2",
     "@npm-questionpro/wick-ui-lib": "^1.21.1",
     "@tanstack/react-query": "^5.90.12",
+    "axios": "^1.13.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.69.0",
